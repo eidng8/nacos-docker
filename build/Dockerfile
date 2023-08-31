@@ -1,5 +1,5 @@
-FROM centos:7.9.2009
-LABEL maintainer="pader <huangmnlove@163.com>"
+FROM alpine:latest
+LABEL maintainer="pader <cheung.jackey@gmail.com>"
 
 # set environment
 ENV MODE="cluster" \
@@ -8,9 +8,8 @@ ENV MODE="cluster" \
     CLASSPATH=".:/home/nacos/conf:$CLASSPATH" \
     CLUSTER_CONF="/home/nacos/conf/cluster.conf" \
     FUNCTION_MODE="all" \
-    JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk" \
     NACOS_USER="nacos" \
-    JAVA="/usr/lib/jvm/java-1.8.0-openjdk/bin/java" \
+    JAVA="/usr/lib/jvm/java-1.8-openjdk/bin/java" \
     JVM_XMS="1g" \
     JVM_XMX="1g" \
     JVM_XMN="512m" \
@@ -19,22 +18,23 @@ ENV MODE="cluster" \
     NACOS_DEBUG="n" \
     TOMCAT_ACCESSLOG_ENABLED="false" \
     TIME_ZONE="Asia/Shanghai"
+    # JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk" \
 
 ARG NACOS_VERSION=2.2.3
 ARG HOT_FIX_FLAG=""
 
 WORKDIR $BASE_DIR
 
-RUN set -x \
-    && yum update -y \
-    && yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel iputils nc vim libcurl \
-    && yum clean all
-RUN curl -SL https://github.com/alibaba/nacos/releases/download/${NACOS_VERSION}${HOT_FIX_FLAG}/nacos-server-${NACOS_VERSION}.tar.gz -o /home/nacos-server.tar.gz \
+RUN apk update \
+    && apk upgrade \
+    && apk add openjdk8 libcurl curl \
+    && apk cache clean
+
+RUN curl -sSL https://github.com/alibaba/nacos/releases/download/${NACOS_VERSION}${HOT_FIX_FLAG}/nacos-server-${NACOS_VERSION}.tar.gz -o /home/nacos-server.tar.gz \
     && tar -xzvf /home/nacos-server.tar.gz -C /home \
     && rm -rf /home/nacos-server.tar.gz /home/nacos/bin/* /home/nacos/conf/*.properties /home/nacos/conf/*.example /home/nacos/conf/nacos-mysql.sql \
-    && ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
-
-
+    && ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime \
+    && echo $TIME_ZONE > /etc/timezone
 
 
 ADD bin/docker-startup.sh bin/docker-startup.sh
@@ -47,6 +47,7 @@ RUN mkdir -p logs \
 	&& ln -sf /dev/stdout start.out \
 	&& ln -sf /dev/stderr start.out
 RUN chmod +x bin/docker-startup.sh
+
 
 EXPOSE 8848
 ENTRYPOINT ["bin/docker-startup.sh"]
