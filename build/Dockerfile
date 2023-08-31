@@ -1,5 +1,5 @@
 FROM alpine:latest
-LABEL maintainer="pader <cheung.jackey@gmail.com>"
+LABEL maintainer="eidng8 <cheung.jackey@gmail.com>"
 
 # set environment
 ENV MODE="cluster" \

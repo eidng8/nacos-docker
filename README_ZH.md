@@ -100,7 +100,7 @@
 * Clone 项目 并且进入项目根目录
 
   ```powershell
-  git clone https://github.com/paderlol/nacos-docker.git
+  git clone https://github.com/eidng8/nacos-docker.git
   cd nacos-docker
   ```
 
